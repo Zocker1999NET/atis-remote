@@ -41,13 +41,9 @@ atis(){
     esac
   fi
 
-  # Move file to atis account
-  scp "$1" "$hostname:$remotePath"
-
-  # Print file on printer pool-sw3
   filename=$( basename "$1" )
   
-  if ssh $hostname "lpr -P $printer -o sides=$mode \"$remotePath/$filename\""
+  if < "$1" | (command -v pv > /dev/null && pv || cat) | ssh $hostname "lpr -P $printer -o sides=$mode -"
   then
     echo "=> Printed file '$filename' successfully on printer '$printer' with print mode '$mode'."
   else
